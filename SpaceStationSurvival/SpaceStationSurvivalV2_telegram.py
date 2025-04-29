@@ -27,9 +27,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # --- Константы ---
-# Рекомендуется хранить токен в переменных окружения, а не в коде
-# TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "ВАШ_ТОКЕН_ЕСЛИ_НЕТ_ПЕРЕМЕННОЙ")
-TOKEN = "7739893547:AAFLu8HPySBvGWbuyQIbsgIzlpXslUg2hyU"
+TOKEN = ""
 TIME_LIMIT = 600  # 10 минут
 
 # ======================================================
@@ -1299,14 +1297,29 @@ async def send_game_over(
 # ======================================================
 # ОСНОВНАЯ ФУНКЦИЯ ЗАПУСКА БОТА
 # ======================================================
+def get_bot_token(token_file: str):
+    try:
+        # Открываем файл и читаем первую строку, убирая лишние пробелы/переносы строк
+        with open(token_file, "r", encoding="utf-8") as f:
+            return f.readline().strip()
+        if not TOKEN:
+            logger.error(
+                f"Файл '{token_file}' найден, но он пуст или содержит только пробелы."
+            )
+            return None  # Убедимся, что TOKEN None, если он пустой
+    except FileNotFoundError:
+        logger.error(
+            f"Файл с токеном '{token_file}' не найден. Пожалуйста, создайте его и поместите туда токен бота."
+        )
+    except Exception as e:
+        logger.error(f"Произошла ошибка при чтении файла с токеном '{token_file}': {e}")
+        return None
 
 
 def main() -> None:
     """Запуск бота."""
-    if TOKEN == "ВАШ_ТОКЕН_ЕСЛИ_НЕТ_ПЕРЕМЕННОЙ":
-        print("!!! ОШИБКА: Не указан токен бота. Бот не может быть запущен.")
-        return
-
+    TOKEN = get_bot_token("SpaceStationSurvival\\bot_token")
+    print(TOKEN)
     application = Application.builder().token(TOKEN).build()
 
     # Обработчики команд
